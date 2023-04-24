@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "RN-Graph",
+    "slug": "RN-Graph",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "RN-Graph"
+}
