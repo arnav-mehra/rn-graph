@@ -3,14 +3,22 @@ import { View, Text } from 'react-native';
 import { coordToPixel, pixelToCoord } from '../util';
 
 
-const Vertex = ({v}) => {
+const Vertex = ({
+    v,
+    zoom,
+    pan
+}) => {
     const selected = useRef(false);
     const [ vert, setVert ] = useState(v);
+    const [ px, py ] = coordToPixel(vert.x, vert.y, zoom, pan);
 
     const handleMouseMove = useRef((e) => {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
         if (!selected) return;
-        vert.x = pixelToCoord(e.clientX);
-        vert.y = pixelToCoord(e.clientY);
+        const [ x, y ] = pixelToCoord(e.clientX, e.clientY, zoom, pan);
+        vert.x = x;
+        vert.y = y;
         setVert(vert);
     });
 
@@ -27,8 +35,8 @@ const Vertex = ({v}) => {
         <View
             style={{
                 position: 'absolute',
-                left: coordToPixel(vert.x),
-                top: coordToPixel(vert.y),
+                left: px,
+                top: py,
                 zIndex: 1,
                 cursor: 'pointer'
             }}

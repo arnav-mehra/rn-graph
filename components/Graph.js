@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import Edge from './Edge';
 import Vertex from './Vertex';
-import { distanceToForce } from '../util';
+import { assignVertexLocations, coordToPixel, distanceToForce, pixelToCoord } from '../util';
 
 const FPS = 480;
 const FPS_INV = 1 / FPS;
@@ -31,44 +31,10 @@ const Graph = ({
             edgeMap[e.to] = edgeMap[e.to] || new Map();
             edgeMap[e.to][e.from] = e;
         }
-        assignVertexLocations();
+        assignVertexLocations(verts, setVerts, edgeMap, vertexMap);
         console.timeEnd();
         setInterval(updateLocation, 1000 / FPS);
     }, []);
-
-    const assignVertexLocations = () => {
-        if (verts.length == 0) return;
-
-        const seen = new Set();
-
-        for (const v of verts) {
-            if (seen.has(v.id)) continue;
-            seen.add(v.id);
-            v.x = 1;
-            v.y = 1;
-            dfsLocations(v, seen, 0);
-        }
-
-        setVerts([ ...verts ]);
-    }
-
-    const dfsLocations = (prevPoint, seen, prevTheta) => {
-        const edgesMap = edgeMap[prevPoint.id] || {};
-        const edges = Object.values(edgesMap);
-
-        const filteredEdges = edges.filter(e => !seen.has(e.to));
-        filteredEdges.forEach(e => seen.add(e.to));
-        console.log({edges})
-
-        const theta = (1 / edges.length) * (2 * Math.PI);
-        filteredEdges.forEach((e, i) => {
-            const v = vertexMap[e.to];
-            const angle = theta * (i + 1) + prevTheta;
-            v.x = prevPoint.x + Math.cos(angle) * 0.5;
-            v.y = prevPoint.y + Math.sin(angle) * 0.5;
-            dfsLocations(v, seen, angle - Math.PI);
-        });
-    };
 
     const updateLocation = () => {
         for (let i = 0; i < verts.length; i++) {
@@ -107,12 +73,58 @@ const Graph = ({
         setVerts([ ...verts ]);
     };
 
+    const selected = useRef(false);
+    const [ zoom, setZoom ] = useState(500);
+    const [ pan, setPan ] = useState([ 0, 0 ]);
+
+    const handleMouseMove = useRef(e => {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        if (!selected.current) return;
+        pan[0] += e.movementX;
+        pan[1] += e.movementY;
+        setPan(pan);
+    })
+
+    useEffect(() => {console.log(pan)}, [pan]);
+
+    useEffect(() => {
+        if (selected.current) {
+            addEventListener('mousemove', handleMouseMove.current)
+        } else {
+            removeEventListener('mousemove', handleMouseMove.current);
+        }
+    }, [selected.current]);
+
+    const handleScroll = (e) => {
+        const newZoom = Math.max(zoom - e.deltaY / 2, 10);
+        
+        const [ x, y ] = pixelToCoord(e.clientX, e.clientY, zoom, pan);
+        pan[0] += x * (zoom - newZoom);
+        pan[1] += y * (zoom - newZoom);
+
+        setZoom(newZoom);
+        setPan(pan);
+    };
+
     return (
-        <>
+        <View
+            style={{
+                border: '10px solid black',
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden',
+            }}
+            onMouseDown={() => selected.current = true}
+            onMouseUp={() => selected.current = false}
+            onWheel={handleScroll}
+        >
             {vertices.map(v =>
                 <Vertex
-                    v={v}
                     key={v.id}
+                    v={v}
+                    zoom={zoom}
+                    pan={pan}
                 />
             )}
             {edges.map(e => 
@@ -121,9 +133,11 @@ const Graph = ({
                     from={vertexMap[e.from]}
                     to={vertexMap[e.to]}
                     edge={e}
+                    zoom={zoom}
+                    pan={pan}
                 />
             )}
-        </>
+        </View>
     );
 };
 

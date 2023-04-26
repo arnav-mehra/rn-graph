@@ -6,25 +6,33 @@ import { coordToPixel, scalarToPixelDelta } from '../util';
 const Line = ({
     from,
     to,
-    edge
+    edge,
+    zoom,
+    pan
 }) => {
     if (!from || !to) return null;
     
     const dx = from.x - to.x;
     const dy = from.y - to.y;
     const d = Math.sqrt(dx * dx + dy * dy);
-
+    
+    const [ px, py ] = coordToPixel(
+        (from.x + to.x) / 2,
+        (from.y + to.y) / 2,
+        zoom, pan
+    );
+    
     return (
         <View
             style={{
                 position: 'absolute',
-                left: coordToPixel((from.x + to.x) / 2),
-                top: coordToPixel((from.y + to.y) / 2)
+                left: px,
+                top: py
             }}
         >
             <View
                 style={{
-                    width: scalarToPixelDelta(d),
+                    width: scalarToPixelDelta(d, zoom),
                     height: 1,
                     backgroundColor: 'black',
                     marginLeft: '-50%',
