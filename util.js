@@ -53,7 +53,7 @@ export const initVertexEdgeMaps = (verts, eds, vertexMap, edgeMap) => {
     }
 }
 
-export const updateLocation = (verts, setVerts, edgeMap) => {
+export const updateLocation = (verts, edgeMap) => {
     for (let i = 0; i < verts.length; i++) {
         for (let j = i + 1; j < verts.length; j++) {
             const from = verts[i];
@@ -88,10 +88,9 @@ export const updateLocation = (verts, setVerts, edgeMap) => {
             to.y += yd;
         }
     }
-    setVerts([ ...verts ]);
 };
 
-export const assignVertexLocations = (verts, setVerts, edgeMap, vertexMap) => {
+export const initVertexLocations = (verts, edgeMap, vertexMap) => {
     if (verts.length == 0) return;
 
     const seen = new Set();
@@ -103,8 +102,6 @@ export const assignVertexLocations = (verts, setVerts, edgeMap, vertexMap) => {
         v.y = 1;
         dfsLocations(v, seen, 0, edgeMap, vertexMap);
     }
-
-    setVerts([ ...verts ]);
 }
 
 export const dfsLocations = (prevPoint, seen, prevTheta, edgeMap, vertexMap) => {

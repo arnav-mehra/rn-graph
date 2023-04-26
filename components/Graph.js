@@ -9,7 +9,8 @@ import {
     initVertexEdgeMaps,
     pixelToCoord,
     updateLocation,
-    FPS
+    FPS,
+    initVertexLocations
 } from '../util';
 
 const Graph = ({
@@ -26,8 +27,13 @@ const Graph = ({
 
     useEffect(() => {
         initVertexEdgeMaps(verts, eds, vertexMap, edgeMap);
-        assignVertexLocations(verts, setVerts, edgeMap, vertexMap);
-        setInterval(() => updateLocation(verts, setVerts, edgeMap), 1000 / FPS);
+        initVertexLocations(verts, edgeMap, vertexMap);
+        setVerts(verts);
+
+        setInterval(() => {
+            updateLocation(verts, edgeMap);
+            setVerts([ ...verts ]);
+        }, 1000 / FPS);
     }, []);
 
     const selected = useRef(false);
