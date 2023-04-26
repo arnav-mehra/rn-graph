@@ -1,3 +1,6 @@
+export const FPS = 480;
+export const FPS_INV = 1 / FPS;
+
 export const vertices = [
     { id: 0, name: 'Node 0' },
     { id: 1, name: 'Node 1' },
@@ -37,6 +40,56 @@ export const pixelToCoord = (px, py, zoom, pan) => ([
     (px - pan[0]) / zoom,
     (py - pan[1]) / zoom
 ]);
+
+export const initVertexEdgeMaps = (verts, eds, vertexMap, edgeMap) => {
+    for (const v of verts) {
+        vertexMap[v.id] = v;
+    }
+    for (const e of eds) {
+        edgeMap[e.from] = edgeMap[e.from] || new Map();
+        edgeMap[e.from][e.to] = e;
+        edgeMap[e.to] = edgeMap[e.to] || new Map();
+        edgeMap[e.to][e.from] = e;
+    }
+}
+
+export const updateLocation = (verts, setVerts, edgeMap) => {
+    for (let i = 0; i < verts.length; i++) {
+        for (let j = i + 1; j < verts.length; j++) {
+            const from = verts[i];
+            const to = verts[j];
+    
+            const dx = from.x - to.x;
+            const dy = from.y - to.y;
+            const dSq = dx * dx + dy * dy;
+
+            const f = distanceToForce(
+                dSq,
+                edgeMap[from.id]?.[to.id] || edgeMap[to.id]?.[from.id]
+            );
+            if (f == 0) continue;
+
+            const xd = dx * f * FPS_INV;
+            const yd = dy * f * FPS_INV;
+            
+            if (from.fixed) {
+                to.x += 2 * xd;
+                to.y += 2 * yd;
+                continue;
+            }
+            if (to.fixed) {
+                from.x -= 2 * xd;
+                from.y -= 2 * yd;
+                continue;
+            }
+            from.x -= xd;
+            from.y -= yd;
+            to.x += xd;
+            to.y += yd;
+        }
+    }
+    setVerts([ ...verts ]);
+};
 
 export const assignVertexLocations = (verts, setVerts, edgeMap, vertexMap) => {
     if (verts.length == 0) return;

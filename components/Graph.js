@@ -3,10 +3,14 @@ import { View } from 'react-native';
 
 import Edge from './Edge';
 import Vertex from './Vertex';
-import { assignVertexLocations, coordToPixel, distanceToForce, pixelToCoord } from '../util';
 
-const FPS = 480;
-const FPS_INV = 1 / FPS;
+import {
+    assignVertexLocations,
+    initVertexEdgeMaps,
+    pixelToCoord,
+    updateLocation,
+    FPS
+} from '../util';
 
 const Graph = ({
     vertices,
@@ -21,57 +25,10 @@ const Graph = ({
     const edgeMap = edgeMapRef.current;
 
     useEffect(() => {
-        console.time();
-        for (const v of verts) {
-            vertexMap[v.id] = v;
-        }
-        for (const e of eds) {
-            edgeMap[e.from] = edgeMap[e.from] || new Map();
-            edgeMap[e.from][e.to] = e;
-            edgeMap[e.to] = edgeMap[e.to] || new Map();
-            edgeMap[e.to][e.from] = e;
-        }
+        initVertexEdgeMaps(verts, eds, vertexMap, edgeMap);
         assignVertexLocations(verts, setVerts, edgeMap, vertexMap);
-        console.timeEnd();
-        setInterval(updateLocation, 1000 / FPS);
+        setInterval(() => updateLocation(verts, setVerts, edgeMap), 1000 / FPS);
     }, []);
-
-    const updateLocation = () => {
-        for (let i = 0; i < verts.length; i++) {
-            for (let j = i + 1; j < verts.length; j++) {
-                const from = verts[i];
-                const to = verts[j];
-        
-                const dx = from.x - to.x;
-                const dy = from.y - to.y;
-                const dSq = dx * dx + dy * dy;
-
-                const f = distanceToForce(
-                    dSq, edgeMap[from.id]?.[to.id] || edgeMap[to.id]?.[from.id]
-                );
-                if (f == 0) continue;
-
-                const xd = dx * f * FPS_INV;
-                const yd = dy * f * FPS_INV;
-                
-                if (from.fixed) {
-                    to.x += 2 * xd;
-                    to.y += 2 * yd;
-                    continue;
-                }
-                if (to.fixed) {
-                    from.x -= 2 * xd;
-                    from.y -= 2 * yd;
-                    continue;
-                }
-                from.x -= xd;
-                from.y -= yd;
-                to.x += xd;
-                to.y += yd;
-            }
-        }
-        setVerts([ ...verts ]);
-    };
 
     const selected = useRef(false);
     const [ zoom, setZoom ] = useState(500);
@@ -86,8 +43,6 @@ const Graph = ({
         setPan(pan);
     })
 
-    useEffect(() => {console.log(pan)}, [pan]);
-
     useEffect(() => {
         if (selected.current) {
             addEventListener('mousemove', handleMouseMove.current)
@@ -97,7 +52,7 @@ const Graph = ({
     }, [selected.current]);
 
     const handleScroll = (e) => {
-        const newZoom = Math.max(zoom - e.deltaY / 2, 10);
+        const newZoom = Math.max(zoom - e.deltaY / 5, 10);
         
         const [ x, y ] = pixelToCoord(e.clientX, e.clientY, zoom, pan);
         pan[0] += x * (zoom - newZoom);
