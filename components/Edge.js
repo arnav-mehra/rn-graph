@@ -1,7 +1,7 @@
 import React from 'react'
 import { View } from 'react-native'
 
-import { coordToPixel, scalarToPixelDelta } from '../util';
+import { coordToPixel, coordToPixelDelta } from '../util';
 
 const Line = ({
     from,
@@ -27,12 +27,12 @@ const Line = ({
             style={{
                 position: 'absolute',
                 left: px,
-                top: py
+                top: py,
             }}
         >
             <View
                 style={{
-                    width: scalarToPixelDelta(d, zoom),
+                    width: coordToPixelDelta(d, zoom),
                     height: 1,
                     backgroundColor: 'black',
                     marginLeft: '-50%',

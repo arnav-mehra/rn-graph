@@ -1,34 +1,28 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
-import { coordToPixel, pixelToCoord } from '../util';
+import {
+    coordToPixel,
+    pixelToCoordDelta
+} from '../util';
 
+import useMoveSelected from './useMoveSelected';
 
 const Vertex = ({
     v,
     zoom,
     pan
 }) => {
-    const selected = useRef(false);
     const [ vert, setVert ] = useState(v);
     const [ px, py ] = coordToPixel(vert.x, vert.y, zoom, pan);
 
-    const handleMouseMove = useRef((e) => {
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-        if (!selected) return;
-        const [ x, y ] = pixelToCoord(e.clientX, e.clientY, zoom, pan);
-        vert.x = x;
-        vert.y = y;
+    const { selected, wrapperProps } = useMoveSelected((e) => {
+        vert.x += pixelToCoordDelta(e.movementX, zoom);
+        vert.y += pixelToCoordDelta(e.movementY, zoom);
         setVert(vert);
     });
 
     useEffect(() => {
         vert.fixed = selected.current;
-        if (selected.current) {
-            addEventListener('mousemove', handleMouseMove.current)
-        } else {
-            removeEventListener('mousemove', handleMouseMove.current);
-        }
     }, [selected.current]);
 
     return (
@@ -40,8 +34,7 @@ const Vertex = ({
                 zIndex: 1,
                 cursor: 'pointer'
             }}
-            onMouseDown={() => selected.current = true}
-            onMouseUp={() => selected.current = false}
+            {...wrapperProps}
         >
             <View
                 style={{
@@ -69,6 +62,6 @@ const Vertex = ({
             </View>
         </View>
     )
-}
+};
 
-export default Vertex
+export default Vertex;

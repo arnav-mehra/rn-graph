@@ -1,34 +1,42 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 
 import Edge from './Edge';
 import Vertex from './Vertex';
 
 import {
-    assignVertexLocations,
+    initVertexLocations,
     initVertexEdgeMaps,
     pixelToCoord,
     updateLocation,
     FPS,
-    initVertexLocations
+    objArrCpy,
+    initPanAndZoom,
+    DEFAULT_ZOOM
 } from '../util';
+import useMoveSelected from './useMoveSelected';
 
 const Graph = ({
-    vertices,
-    edges
+    vertices: inputVertices,
+    edges: inputEdges
 }) => {
-    const [ verts, setVerts ] = useState(vertices);
-    const [ eds, setEds ] = useState(edges);
+    const [ verts, setVerts ] = useState(objArrCpy(inputVertices));
+    const [ edges, setEdges ] = useState(objArrCpy(inputEdges));
 
-    const vertexMapRef = useRef(new Map());
-    const vertexMap = vertexMapRef.current;
-    const edgeMapRef = useRef(new Map());
-    const edgeMap = edgeMapRef.current;
+    const { current: vertexMap } = useRef(new Map());
+    const { current: edgeMap } = useRef(new Map());
+
+    const [ zoom, setZoom ] = useState(DEFAULT_ZOOM);
+    const [ pan, setPan ] = useState([ 0, 0 ]);
+
+    const windowDim = useWindowDimensions();
 
     useEffect(() => {
-        initVertexEdgeMaps(verts, eds, vertexMap, edgeMap);
+        initVertexEdgeMaps(verts, edges, vertexMap, edgeMap);
         initVertexLocations(verts, edgeMap, vertexMap);
-        setVerts(verts);
+        const zoom = initPanAndZoom(verts, windowDim);
+        setZoom(zoom);
+        setVerts([ ...verts ]);
 
         setInterval(() => {
             updateLocation(verts, edgeMap);
@@ -36,26 +44,12 @@ const Graph = ({
         }, 1000 / FPS);
     }, []);
 
-    const selected = useRef(false);
-    const [ zoom, setZoom ] = useState(500);
-    const [ pan, setPan ] = useState([ 0, 0 ]);
-
-    const handleMouseMove = useRef(e => {
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-        if (!selected.current) return;
+    const { wrapperProps } = useMoveSelected((e) => {
         pan[0] += e.movementX;
         pan[1] += e.movementY;
+        console.log(pan)
         setPan(pan);
-    })
-
-    useEffect(() => {
-        if (selected.current) {
-            addEventListener('mousemove', handleMouseMove.current)
-        } else {
-            removeEventListener('mousemove', handleMouseMove.current);
-        }
-    }, [selected.current]);
+    });
 
     const handleScroll = (e) => {
         const newZoom = Math.max(zoom - e.deltaY / 5, 10);
@@ -76,11 +70,10 @@ const Graph = ({
                 height: '100%',
                 overflow: 'hidden',
             }}
-            onMouseDown={() => selected.current = true}
-            onMouseUp={() => selected.current = false}
+            {...wrapperProps}
             onWheel={handleScroll}
         >
-            {vertices.map(v =>
+            {verts.map((v) =>
                 <Vertex
                     key={v.id}
                     v={v}

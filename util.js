@@ -1,6 +1,10 @@
 export const FPS = 480;
 export const FPS_INV = 1 / FPS;
 
+export const DEFAULT_ZOOM = 500;
+
+export const objArrCpy = (arr) => arr.map(o => ({ ...o }));
+
 export const vertices = [
     { id: 0, name: 'Node 0' },
     { id: 1, name: 'Node 1' },
@@ -34,7 +38,9 @@ export const coordToPixel = (x, y, zoom, pan) => ([
     zoom * y + pan[1]
 ]);
 
-export const scalarToPixelDelta = (d, zoom) => zoom * d;
+export const coordToPixelDelta = (d, zoom) => zoom * d;
+
+export const pixelToCoordDelta = (d, zoom) => d / zoom;
 
 export const pixelToCoord = (px, py, zoom, pan) => ([
     (px - pan[0]) / zoom,
@@ -104,20 +110,65 @@ export const initVertexLocations = (verts, edgeMap, vertexMap) => {
     }
 }
 
+export const initPanAndZoom = (verts, windowDim) => {    
+    // get coord avg
+    let xVal = 0;
+    let yVal = 0;
+    for (const v of verts) {
+        xVal += v.x;
+        yVal += v.y;
+    }
+    const len = 1 / verts.length;
+    xVal *= len;
+    yVal *= len;
+
+    // normalize
+    let farthestX = 0;
+    let farthestY = 0;
+    for (const v of verts) {
+        v.x -= xVal;
+        v.y -= yVal;
+        farthestX = Math.max(farthestX, Math.abs(v.x));
+        farthestY = Math.max(farthestY, Math.abs(v.y));
+    }
+
+    const zoom = Math.max(
+        windowDim.width / (farthestX * 3),
+        windowDim.height / (farthestY * 3)
+    );
+
+    // recenter vertices
+    const center = pixelToCoord(
+        windowDim.width / 2,
+        windowDim.height / 2,
+        zoom, [ 0, 0 ]
+    );
+    for (const v of verts) {
+        v.x += center[0];
+        v.y += center[1];
+    }
+
+    return zoom;
+};
+
 export const dfsLocations = (prevPoint, seen, prevTheta, edgeMap, vertexMap) => {
     const edgesMap = edgeMap[prevPoint.id] || {};
     const edges = Object.values(edgesMap);
 
-    const filteredEdges = edges.filter(e => !seen.has(e.to));
-    filteredEdges.forEach(e => seen.add(e.to));
-    console.log({edges})
+    const filteredEdges = [];
+    for (const e of edges) {
+        if (seen.has(e.to)) continue;
+        seen.add(e.to);
+        filteredEdges.push(e);
+    }
 
     const theta = (1 / edges.length) * (2 * Math.PI);
-    filteredEdges.forEach((e, i) => {
+    for (let i = 0; i < filteredEdges.length; i++) {
+        const e = filteredEdges[i];
         const v = vertexMap[e.to];
         const angle = theta * (i + 1) + prevTheta;
         v.x = prevPoint.x + Math.cos(angle) * 0.5;
         v.y = prevPoint.y + Math.sin(angle) * 0.5;
         dfsLocations(v, seen, angle - Math.PI, edgeMap, vertexMap);
-    });
+    }
 };
