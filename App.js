@@ -9,6 +9,8 @@ const App = () => {
       <Graph
         vertices={vertices}
         edges={edges}
+        width={'100%'}
+        height={'100%'}
       />
     </View>
   );

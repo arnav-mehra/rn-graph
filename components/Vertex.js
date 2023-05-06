@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import {
     coordToPixel,
+    pixelToCoord,
     pixelToCoordDelta
 } from '../util';
 
@@ -13,17 +14,24 @@ const Vertex = ({
     pan
 }) => {
     const [ vert, setVert ] = useState(v);
-    const [ px, py ] = coordToPixel(vert.x, vert.y, zoom, pan);
-
+    
     const { selected, wrapperProps } = useMoveSelected((e) => {
+        // let [ x, y ] = coordToPixel(vert.x, vert.y, zoom, pan);
+        // x += e.movementX;
+        // y += e.movementY;
+        // [ vert.x, vert.y ] = pixelToCoord(x, y, zoom, pan)
+        
         vert.x += pixelToCoordDelta(e.movementX, zoom);
         vert.y += pixelToCoordDelta(e.movementY, zoom);
+        console.log(vert.x, vert.y)
         setVert(vert);
     });
 
     useEffect(() => {
         vert.fixed = selected.current;
     }, [selected.current]);
+
+    const [ px, py ] = coordToPixel(vert.x, vert.y, zoom, pan);
 
     return (
         <View
@@ -32,7 +40,8 @@ const Vertex = ({
                 left: px,
                 top: py,
                 zIndex: 1,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                // opacity: 0.2
             }}
             {...wrapperProps}
         >

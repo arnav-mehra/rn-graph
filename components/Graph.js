@@ -18,7 +18,9 @@ import useMoveSelected from './useMoveSelected';
 
 const Graph = ({
     vertices: inputVertices,
-    edges: inputEdges
+    edges: inputEdges,
+    width: inputWidth,
+    height: inputHeight
 }) => {
     const [ verts, setVerts ] = useState(objArrCpy(inputVertices));
     const [ edges, setEdges ] = useState(objArrCpy(inputEdges));
@@ -28,21 +30,24 @@ const Graph = ({
 
     const [ zoom, setZoom ] = useState(DEFAULT_ZOOM);
     const [ pan, setPan ] = useState([ 0, 0 ]);
-
-    const windowDim = useWindowDimensions();
+    const [ window, setWindow ] = useState();
 
     useEffect(() => {
+        if (!window) return;
+
         initVertexEdgeMaps(verts, edges, vertexMap, edgeMap);
         initVertexLocations(verts, edgeMap, vertexMap);
-        const zoom = initPanAndZoom(verts, windowDim);
+        
+        const zoom = initPanAndZoom(verts, window);
         setZoom(zoom);
+
         setVerts([ ...verts ]);
 
         setInterval(() => {
             updateLocation(verts, edgeMap);
             setVerts([ ...verts ]);
         }, 1000 / FPS);
-    }, []);
+    }, [window])
 
     const { wrapperProps } = useMoveSelected((e) => {
         pan[0] += e.movementX;
@@ -66,12 +71,14 @@ const Graph = ({
         <View
             style={{
                 border: '10px solid black',
-                width: '100%',
-                height: '100%',
+                width: inputWidth,
+                height: inputHeight,
                 overflow: 'hidden',
+                position: 'relative'
             }}
-            {...wrapperProps}
             onWheel={handleScroll}
+            onLayout={e => setWindow(e.nativeEvent.layout)}
+            {...wrapperProps}
         >
             {verts.map((v) =>
                 <Vertex

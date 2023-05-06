@@ -16,27 +16,21 @@ export const vertices = [
 ]
 
 export const edges = [
-    { from: 0, to: 1, directed: false },
-    { from: 0, to: 2, directed: false },
-    { from: 0, to: 3, directed: false },
-    { from: 1, to: 4, directed: false },
-    { from: 1, to: 5, directed: false },
-    { from: 2, to: 6, directed: false },
-    { from: 3, to: 6, directed: false },
+    { from: 0, to: 1, directed: 2 },
+    { from: 0, to: 2, directed: true },
+    { from: 0, to: 3, directed: true },
+    { from: 1, to: 4, directed: true },
+    { from: 1, to: 5, directed: true },
+    { from: 2, to: 6, directed: true },
+    { from: 3, to: 6, directed: true },
 ]
 
 export const distanceToForce = (distSq, isEdge) => {
-    if (distSq < 0.2 * 0.2) return -2;
-    if (distSq < 0.4 * 0.4) return 0;
-    if (distSq < 0.6 * 0.6) return 0;
-    if (!isEdge) return 0;
-    return (2 * distSq);
+    if (distSq < 0.4 * 0.4) return -2; // repel
+    if (!isEdge) return 0; // no edge, no attract. neutral
+    if (distSq < 0.6 * 0.6) return 0; // neutral
+    return (2 * distSq); // attract
 };
-
-export const coordToPixel = (x, y, zoom, pan) => ([
-    zoom * x + pan[0],
-    zoom * y + pan[1]
-]);
 
 export const coordToPixelDelta = (d, zoom) => zoom * d;
 
@@ -46,6 +40,21 @@ export const pixelToCoord = (px, py, zoom, pan) => ([
     (px - pan[0]) / zoom,
     (py - pan[1]) / zoom
 ]);
+
+export const coordToPixel = (x, y, zoom, pan) => ([
+    zoom * x + pan[0],
+    zoom * y + pan[1]
+]);
+
+export const TRIANGLE_SIZE = 10;
+
+const triangleCoords = [
+    [ TRIANGLE_SIZE / 4, TRIANGLE_SIZE / 2 + TRIANGLE_SIZE / 4 * Math.sqrt(3) ],
+    [ TRIANGLE_SIZE / 4, TRIANGLE_SIZE / 2 - TRIANGLE_SIZE / 4 * Math.sqrt(3) ],
+    [ TRIANGLE_SIZE, TRIANGLE_SIZE / 2 ]
+]
+
+export const triangleCoordStr = triangleCoords.map(([ x, y ]) => `${x},${y}`).join(' ')
 
 export const initVertexEdgeMaps = (verts, eds, vertexMap, edgeMap) => {
     for (const v of verts) {
@@ -110,7 +119,7 @@ export const initVertexLocations = (verts, edgeMap, vertexMap) => {
     }
 }
 
-export const initPanAndZoom = (verts, windowDim) => {    
+export const initPanAndZoom = (verts, window) => {    
     // get coord avg
     let xVal = 0;
     let yVal = 0;
@@ -133,14 +142,14 @@ export const initPanAndZoom = (verts, windowDim) => {
     }
 
     const zoom = Math.max(
-        windowDim.width / (farthestX * 3),
-        windowDim.height / (farthestY * 3)
+        window.width / (farthestX * 3),
+        window.height / (farthestY * 3)
     );
 
     // recenter vertices
     const center = pixelToCoord(
-        windowDim.width / 2,
-        windowDim.height / 2,
+        window.width / 2,
+        window.height / 2,
         zoom, [ 0, 0 ]
     );
     for (const v of verts) {
