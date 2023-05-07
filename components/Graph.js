@@ -1,34 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { View } from 'react-native';
+
+import {
+    FPS,
+    objArrCpy,
+    inheritDefaultStyle,
+    pixelToCoord,
+    initVertexLocations,
+    initVertexEdgeMaps,
+    initPanAndZoom,
+    updateLocation,
+} from '../util';
 
 import Edge from './Edge';
 import Vertex from './Vertex';
+import useDraggable from './useDraggable';
 
-import {
-    initVertexLocations,
-    initVertexEdgeMaps,
-    pixelToCoord,
-    updateLocation,
-    FPS,
-    objArrCpy,
-    initPanAndZoom,
-    DEFAULT_ZOOM
-} from '../util';
-import useMoveSelected from './useMoveSelected';
 
 const Graph = ({
     vertices: inputVertices,
     edges: inputEdges,
-    width: inputWidth,
-    height: inputHeight
+    style: inputStyle
 }) => {
+    const { current: style } = useRef(inheritDefaultStyle(inputStyle));
+
     const [ verts, setVerts ] = useState(objArrCpy(inputVertices));
     const [ edges, setEdges ] = useState(objArrCpy(inputEdges));
-
     const { current: vertexMap } = useRef(new Map());
     const { current: edgeMap } = useRef(new Map());
 
-    const [ zoom, setZoom ] = useState(DEFAULT_ZOOM);
+    const [ zoom, setZoom ] = useState(500);
     const [ pan, setPan ] = useState([ 0, 0 ]);
     const [ window, setWindow ] = useState();
 
@@ -36,8 +37,7 @@ const Graph = ({
         if (!window) return;
 
         initVertexEdgeMaps(verts, edges, vertexMap, edgeMap);
-        initVertexLocations(verts, edgeMap, vertexMap);
-        
+        initVertexLocations(verts, edgeMap, vertexMap);    
         const zoom = initPanAndZoom(verts, window);
         setZoom(zoom);
 
@@ -47,12 +47,11 @@ const Graph = ({
             updateLocation(verts, edgeMap);
             setVerts([ ...verts ]);
         }, 1000 / FPS);
-    }, [window])
+    }, [window]);
 
-    const { wrapperProps } = useMoveSelected((e) => {
+    const { wrapperProps } = useDraggable((e) => {
         pan[0] += e.movementX;
         pan[1] += e.movementY;
-        console.log(pan)
         setPan(pan);
     });
 
@@ -70,9 +69,9 @@ const Graph = ({
     return (
         <View
             style={{
-                border: '10px solid black',
-                width: inputWidth,
-                height: inputHeight,
+                border: style.frame.border,
+                width: style.frame.width,
+                height: style.frame.height,
                 overflow: 'hidden',
                 position: 'relative'
             }}
@@ -83,9 +82,11 @@ const Graph = ({
             {verts.map((v) =>
                 <Vertex
                     key={v.id}
-                    v={v}
+                    vert={v}
+
                     zoom={zoom}
                     pan={pan}
+                    style={style}
                 />
             )}
             {edges.map(e => 
@@ -94,8 +95,10 @@ const Graph = ({
                     from={vertexMap[e.from]}
                     to={vertexMap[e.to]}
                     edge={e}
+
                     zoom={zoom}
                     pan={pan}
+                    style={style}
                 />
             )}
         </View>

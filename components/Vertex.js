@@ -1,38 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
+
 import {
     coordToPixel,
-    pixelToCoord,
     pixelToCoordDelta
 } from '../util';
 
-import useMoveSelected from './useMoveSelected';
+import useDraggable from './useDraggable';
+
 
 const Vertex = ({
-    v,
+    vert,
     zoom,
-    pan
+    pan,
+    style
 }) => {
-    const [ vert, setVert ] = useState(v);
-    
-    const { selected, wrapperProps } = useMoveSelected((e) => {
-        // let [ x, y ] = coordToPixel(vert.x, vert.y, zoom, pan);
-        // x += e.movementX;
-        // y += e.movementY;
-        // [ vert.x, vert.y ] = pixelToCoord(x, y, zoom, pan)
-        
-        vert.x += pixelToCoordDelta(e.movementX, zoom);
-        vert.y += pixelToCoordDelta(e.movementY, zoom);
-        console.log(vert.x, vert.y)
-        setVert(vert);
-    });
+    // make vertex draggable.
+    const { selected, wrapperProps } = useDraggable(
+        (e, deps) => {
+            const [ zoom ] = deps;
+            vert.x += pixelToCoordDelta(e.movementX, zoom);
+            vert.y += pixelToCoordDelta(e.movementY, zoom);
+        },
+        [ zoom ] // dependency array.
+    );
 
+    // track vertex selection for attract/repel effect.
     useEffect(() => {
         vert.fixed = selected.current;
     }, [selected.current]);
 
+    // virtual coords -> pixel coords
     const [ px, py ] = coordToPixel(vert.x, vert.y, zoom, pan);
 
+    // render vertex.
     return (
         <View
             style={{
@@ -41,17 +42,17 @@ const Vertex = ({
                 top: py,
                 zIndex: 1,
                 cursor: 'pointer',
-                // opacity: 0.2
+                userSelect: 'none'
             }}
             {...wrapperProps}
         >
             <View
                 style={{
-                    backgroundColor: 'red',
-                    borderRadius: '50%',
+                    backgroundColor: style.vertices.color,
+                    borderRadius: style.vertices.radius,
 
-                    width: 60,
-                    height: 60,
+                    width: style.vertices.size,
+                    height: style.vertices.size,
                     marginLeft: '-50%',
                     marginTop: '-50%',
                     
@@ -62,8 +63,8 @@ const Vertex = ({
             >
                 <Text
                     style={{
-                        color: 'white',
-                        fontWeight: 'bold',
+                        color: style.vertices.textColor,
+                        fontWeight: style.vertices.textWeight,
                     }}
                 >
                     {vert.name}

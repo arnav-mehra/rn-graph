@@ -1,9 +1,4 @@
-export const FPS = 480;
-export const FPS_INV = 1 / FPS;
-
-export const DEFAULT_ZOOM = 500;
-
-export const objArrCpy = (arr) => arr.map(o => ({ ...o }));
+// TEMPORARY TEST DATA
 
 export const vertices = [
     { id: 0, name: 'Node 0' },
@@ -13,7 +8,7 @@ export const vertices = [
     { id: 4, name: 'Node 4' },
     { id: 5, name: 'Node 5' },
     { id: 6, name: 'Node 6' },
-]
+];
 
 export const edges = [
     { from: 0, to: 1, directed: 2 },
@@ -23,13 +18,60 @@ export const edges = [
     { from: 1, to: 5, directed: true },
     { from: 2, to: 6, directed: true },
     { from: 3, to: 6, directed: true },
-]
+];
 
-export const distanceToForce = (distSq, isEdge) => {
-    if (distSq < 0.4 * 0.4) return -2; // repel
-    if (!isEdge) return 0; // no edge, no attract. neutral
-    if (distSq < 0.6 * 0.6) return 0; // neutral
-    return (2 * distSq); // attract
+// TRUE START OF util.js
+
+export const FPS = 480;
+export const FPS_INV = 1 / FPS;
+
+export const DEFAULT_STYLE = {
+    vertices: {
+        textColor: 'white',
+        textWeight: 'bold',
+        color: 'red',
+        radius: '50%',
+        size: 60
+    },
+    frame: {
+        width: '100vw',
+        height: '100vh',
+        border: '10px solid black',
+    },
+    edges: {
+        line: {
+            color: 'black',
+            width: 2
+        },
+        arrow: {
+            size: 12,
+            color: 'black',
+            width: 2,
+            fill: 'white'
+        }
+    }
+};
+
+export const inheritDefaultStyle = (inputStyle) => {
+    const style = {};
+    style.vertices = { ...DEFAULT_STYLE.vertices, ...inputStyle?.vertices };
+    style.frame = { ...DEFAULT_STYLE.frame, ...inputStyle?.frame };
+    style.edges = { ...DEFAULT_STYLE.edges, ...inputStyle?.edges };
+    style.edges.line = { ...DEFAULT_STYLE.edges.line, ...inputStyle?.edges?.line };
+    style.edges.arrow = { ...DEFAULT_STYLE.edges.arrow, ...inputStyle?.edges?.arrow };
+    return style;
+}
+
+export const objArrCpy = (arr) => arr.map(o => ({ ...o }));
+
+const c1 = (0.5 + 0.25 * Math.sqrt(3));
+const c2 = (0.5 - 0.25 * Math.sqrt(3));
+const triCoordStrCache = new Map();
+export const getTriangleCoordStr = (size) => {
+    if (triCoordStrCache[size]) return triCoordStrCache[size];
+    const str = `${size / 4},${size * c1} ${size / 4},${size * c2} ${size},${size / 2}`;
+    triCoordStrCache[size] = str;
+    return str;
 };
 
 export const coordToPixelDelta = (d, zoom) => zoom * d;
@@ -46,15 +88,12 @@ export const coordToPixel = (x, y, zoom, pan) => ([
     zoom * y + pan[1]
 ]);
 
-export const TRIANGLE_SIZE = 10;
-
-const triangleCoords = [
-    [ TRIANGLE_SIZE / 4, TRIANGLE_SIZE / 2 + TRIANGLE_SIZE / 4 * Math.sqrt(3) ],
-    [ TRIANGLE_SIZE / 4, TRIANGLE_SIZE / 2 - TRIANGLE_SIZE / 4 * Math.sqrt(3) ],
-    [ TRIANGLE_SIZE, TRIANGLE_SIZE / 2 ]
-]
-
-export const triangleCoordStr = triangleCoords.map(([ x, y ]) => `${x},${y}`).join(' ')
+export const distanceToForce = (distSq, isEdge) => {
+    if (distSq < 0.4 * 0.4) return -4; // repel
+    if (!isEdge) return 0; // no edge, no attract. neutral
+    if (distSq < 0.6 * 0.6) return 0; // neutral
+    return (4 * distSq); // attract
+};
 
 export const initVertexEdgeMaps = (verts, eds, vertexMap, edgeMap) => {
     for (const v of verts) {

@@ -1,21 +1,30 @@
-import React from 'react'
-import { Svg, Line, Polygon } from 'react-native-svg'
-import { View, Text } from 'react-native';
-import { TRIANGLE_SIZE, coordToPixel, coordToPixelDelta, triangleCoordStr } from '../util';
+import React from 'react';
+import { View } from 'react-native';
+import { Svg, Line, Polygon } from 'react-native-svg';
+
+import {
+    coordToPixel,
+    getTriangleCoordStr
+} from '../util';
+
 
 const Edge = ({
     from,
     to,
     edge,
     zoom,
-    pan
+    pan,
+    style
 }) => {
+    // invalid vertex, don't render.
     if (!from || !to) return null;
     
+    // calculate edge length.
     const dx = from.x - to.x;
     const dy = from.y - to.y;
     const d = Math.sqrt(dx * dx + dy * dy);
     
+    // calculate initial & final pixel coords.
     const [ ipx, ipy ] = coordToPixel(
         from.x, from.y, zoom, pan
     );
@@ -23,10 +32,17 @@ const Edge = ({
         to.x, to.y, zoom, pan
     );
     
-    // console.log({dx,dy,d})
+    // edge styles.
+    const lineStyle = style.edges.line;
+    const arrowStyle = style.edges.arrow;
 
+    // a precomputed value for triangle positioning.
+    const pVal = (style.vertices.size + arrowStyle.size) / (2 * d);
+
+    // render edge.
     return (
         <>
+            {/* Edge line */}
             <Svg
                 style={{
                     width: '100%',
@@ -40,63 +56,65 @@ const Edge = ({
                     y1={ipy}
                     x2={fpx}
                     y2={fpy}
-                    stroke="black"
-                    strokeWidth="2"
+                    stroke={lineStyle.color}
+                    strokeWidth={lineStyle.width}
                 />
             </Svg>
 
+            {/* Directed edge */}
             {edge.directed && (
                 <View
                     style={{
                         position: 'absolute',
                         overflow: 'visible',
-                        left: ipx - (30 + TRIANGLE_SIZE / 2) * (dx / d),
-                        top: ipy - (30 + TRIANGLE_SIZE / 2) * (dy / d)
+                        left: ipx - pVal * dx,
+                        top: ipy - pVal * dy
                     }}
                 >
                     <Svg
                         style={{
-                            width: TRIANGLE_SIZE,
-                            height: TRIANGLE_SIZE,
+                            width: arrowStyle.size,
+                            height: arrowStyle.size,
                             transform: [{
                                 rotate: `${Math.atan2(dy, dx) * 180 / Math.PI}deg`
                             }],
-                            marginTop: -TRIANGLE_SIZE / 2,
-                            marginLeft: -TRIANGLE_SIZE / 2
+                            marginTop: -arrowStyle.size / 2,
+                            marginLeft: -arrowStyle.size / 2
                         }}
                     >
                         <Polygon
-                            points={triangleCoordStr}
-                            fill="white"
-                            stroke="black"
-                            strokeWidth="2"
+                            points={getTriangleCoordStr(arrowStyle.size)}
+                            fill={arrowStyle.fill}
+                            stroke={arrowStyle.color}
+                            strokeWidth={arrowStyle.width}
                         />
                     </Svg>
                 </View>
             )}
             
+            {/* Bidirectional edge */}
             {edge.directed === 2 && (
                 <View
                     style={{
                         position: 'absolute',
                         overflow: 'visible',
-                        left: fpx + (30 + TRIANGLE_SIZE / 2) * (dx / d),
-                        top: fpy + (30 + TRIANGLE_SIZE / 2) * (dy / d)
+                        left: fpx + pVal * dx,
+                        top: fpy + pVal * dy
                     }}
                 >
                     <Svg
                         style={{
-                            width: TRIANGLE_SIZE,
-                            height: TRIANGLE_SIZE,
+                            width: arrowStyle.size,
+                            height: arrowStyle.size,
                             transform: [{
                                 rotate: `${Math.atan2(dy, dx) * 180 / Math.PI + 180}deg`
                             }],
-                            marginTop: -TRIANGLE_SIZE / 2,
-                            marginLeft: -TRIANGLE_SIZE / 2
+                            marginTop: -arrowStyle.size / 2,
+                            marginLeft: -arrowStyle.size / 2
                         }}
                     >
                         <Polygon
-                            points={triangleCoordStr}
+                            points={getTriangleCoordStr(arrowStyle.size)}
                             fill="white"
                             stroke="black"
                             strokeWidth="2"
