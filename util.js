@@ -53,14 +53,27 @@ export const DEFAULT_STYLE = {
 };
 
 export const inheritDefaultStyle = (inputStyle) => {
-    const style = {};
-    style.vertices = { ...DEFAULT_STYLE.vertices, ...inputStyle?.vertices };
-    style.frame = { ...DEFAULT_STYLE.frame, ...inputStyle?.frame };
-    style.edges = { ...DEFAULT_STYLE.edges, ...inputStyle?.edges };
-    style.edges.line = { ...DEFAULT_STYLE.edges.line, ...inputStyle?.edges?.line };
-    style.edges.arrow = { ...DEFAULT_STYLE.edges.arrow, ...inputStyle?.edges?.arrow };
-    return style;
-}
+    return {
+        vertices: {
+            ...DEFAULT_STYLE.vertices,
+            ...inputStyle?.vertices
+        },
+        frame: {
+            ...DEFAULT_STYLE.frame,
+            ...inputStyle?.frame
+        },
+        edges: {
+            line: {
+                ...DEFAULT_STYLE.edges.line,
+                ...inputStyle?.edges?.line
+            },
+            arrow: {
+                ...DEFAULT_STYLE.edges.arrow,
+                ...inputStyle?.edges?.arrow
+            }
+        }
+    };
+};
 
 export const objArrCpy = (arr) => arr.map(o => ({ ...o }));
 
@@ -105,7 +118,7 @@ export const initVertexEdgeMaps = (verts, eds, vertexMap, edgeMap) => {
         edgeMap[e.to] = edgeMap[e.to] || new Map();
         edgeMap[e.to][e.from] = e;
     }
-}
+};
 
 export const updateLocation = (verts, edgeMap) => {
     for (let i = 0; i < verts.length; i++) {
@@ -156,7 +169,7 @@ export const initVertexLocations = (verts, edgeMap, vertexMap) => {
         v.y = 1;
         dfsLocations(v, seen, 0, edgeMap, vertexMap);
     }
-}
+};
 
 export const initPanAndZoom = (verts, window) => {    
     // get coord avg
