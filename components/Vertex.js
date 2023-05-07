@@ -7,6 +7,7 @@ import {
 } from '../util';
 
 import useDraggable from './useDraggable';
+import CenteredView from './CenteredView';
 
 
 const Vertex = ({
@@ -35,26 +36,17 @@ const Vertex = ({
 
     // render vertex.
     return (
-        <View
-            style={{
-                position: 'absolute',
-                left: px,
-                top: py,
-                zIndex: 1,
-                cursor: 'pointer',
-                userSelect: 'none'
-            }}
+        <CenteredView
+            left={px}
+            top={py}
             {...wrapperProps}
         >
             <View
                 style={{
                     backgroundColor: style.vertices.color,
                     borderRadius: style.vertices.radius,
-
                     width: style.vertices.size,
                     height: style.vertices.size,
-                    marginLeft: '-50%',
-                    marginTop: '-50%',
                     
                     display: 'flex',
                     justifyContent: 'center',
@@ -67,10 +59,10 @@ const Vertex = ({
                         fontWeight: style.vertices.textWeight,
                     }}
                 >
-                    {vert.name}
+                    {vert.label}
                 </Text>
             </View>
-        </View>
+        </CenteredView>
     )
 };
 

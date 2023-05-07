@@ -1,11 +1,12 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import { Svg, Line, Polygon } from 'react-native-svg';
 
 import {
     coordToPixel,
     getTriangleCoordStr
 } from '../util';
+import CenteredView from './CenteredView';
 
 
 const Edge = ({
@@ -38,10 +39,33 @@ const Edge = ({
 
     // a precomputed value for triangle positioning.
     const pVal = (style.vertices.size + arrowStyle.size) / (2 * d);
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    const absAngle = (angle + 360) % 360;
+    const uprightAngle = (absAngle > 90 && absAngle < 270) ? angle + 180 : angle;
 
     // render edge.
     return (
         <>
+            {/* Edge label */}
+            {edge.label && (
+                <CenteredView
+                    left={(ipx + fpx) / 2}
+                    top={(ipy + fpy) / 2}
+                    angle={uprightAngle}
+                >
+                    <Text
+                        style={{
+                            color: style.edges.label.color,
+                            fontSize: style.edges.label.size,
+                            fontWeight: style.edges.label.weight,
+                            paddingBottom: '50%'
+                        }}
+                    >
+                        {edge.label}
+                    </Text>
+                </CenteredView>
+            )}
+            
             {/* Edge line */}
             <Svg
                 style={{
@@ -61,25 +85,17 @@ const Edge = ({
                 />
             </Svg>
 
-            {/* Directed edge */}
+            {/* Directed edge triangle */}
             {edge.directed && (
-                <View
-                    style={{
-                        position: 'absolute',
-                        overflow: 'visible',
-                        left: ipx - pVal * dx,
-                        top: ipy - pVal * dy
-                    }}
+                <CenteredView
+                    left={ipx - pVal * dx}
+                    top={ipy - pVal * dy}
+                    angle={angle}
                 >
                     <Svg
                         style={{
                             width: arrowStyle.size,
                             height: arrowStyle.size,
-                            transform: [{
-                                rotate: `${Math.atan2(dy, dx) * 180 / Math.PI}deg`
-                            }],
-                            marginTop: -arrowStyle.size / 2,
-                            marginLeft: -arrowStyle.size / 2
                         }}
                     >
                         <Polygon
@@ -89,28 +105,20 @@ const Edge = ({
                             strokeWidth={arrowStyle.width}
                         />
                     </Svg>
-                </View>
+                </CenteredView>
             )}
             
-            {/* Bidirectional edge */}
+            {/* Bidirectional edge 2nd triangle */}
             {edge.directed === 2 && (
-                <View
-                    style={{
-                        position: 'absolute',
-                        overflow: 'visible',
-                        left: fpx + pVal * dx,
-                        top: fpy + pVal * dy
-                    }}
+                <CenteredView
+                    left={fpx + pVal * dx}
+                    top={fpy + pVal * dy}
+                    angle={angle + 180}
                 >
                     <Svg
                         style={{
                             width: arrowStyle.size,
-                            height: arrowStyle.size,
-                            transform: [{
-                                rotate: `${Math.atan2(dy, dx) * 180 / Math.PI + 180}deg`
-                            }],
-                            marginTop: -arrowStyle.size / 2,
-                            marginLeft: -arrowStyle.size / 2
+                            height: arrowStyle.size
                         }}
                     >
                         <Polygon
@@ -120,7 +128,7 @@ const Edge = ({
                             strokeWidth="2"
                         />
                     </Svg>
-                </View>
+                </CenteredView>
             )}
         </>
     )
