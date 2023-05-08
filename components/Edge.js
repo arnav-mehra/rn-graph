@@ -10,16 +10,15 @@ import CenteredView from './CenteredView';
 
 
 const Edge = ({
-    from,
-    to,
     edge,
+    style,
+    from,
+    fromStyle,
+    to,
+    toStyle,
     zoom,
     pan,
-    style
-}) => {
-    // invalid vertex, don't render.
-    if (!from || !to) return null;
-    
+}) => {    
     // calculate edge length.
     const dx = from.x - to.x;
     const dy = from.y - to.y;
@@ -32,13 +31,10 @@ const Edge = ({
     const [ fpx, fpy ] = coordToPixel(
         to.x, to.y, zoom, pan
     );
-    
-    // edge styles.
-    const lineStyle = style.edges.line;
-    const arrowStyle = style.edges.arrow;
 
-    // a precomputed value for triangle positioning.
-    const pVal = (style.vertices.size + arrowStyle.size) / (2 * d);
+    // a precomputed values for triangle positioning & angling.
+    const toVal = (toStyle.size + style.arrow.size) / (2 * d);
+    const fromVal = (fromStyle.size + style.arrow.size) / (2 * d);
     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
     const absAngle = (angle + 360) % 360;
     const uprightAngle = (absAngle > 90 && absAngle < 270) ? angle + 180 : angle;
@@ -55,9 +51,9 @@ const Edge = ({
                 >
                     <Text
                         style={{
-                            color: style.edges.label.color,
-                            fontSize: style.edges.label.size,
-                            fontWeight: style.edges.label.weight,
+                            color: style.label.color,
+                            fontSize: style.label.size,
+                            fontWeight: style.label.weight,
                             paddingBottom: '50%'
                         }}
                     >
@@ -80,29 +76,29 @@ const Edge = ({
                     y1={ipy}
                     x2={fpx}
                     y2={fpy}
-                    stroke={lineStyle.color}
-                    strokeWidth={lineStyle.width}
+                    stroke={style.line.color}
+                    strokeWidth={style.line.width}
                 />
             </Svg>
 
             {/* Directed edge triangle */}
             {edge.directed && (
                 <CenteredView
-                    left={ipx - pVal * dx}
-                    top={ipy - pVal * dy}
+                    left={ipx - toVal * dx}
+                    top={ipy - toVal * dy}
                     angle={angle}
                 >
                     <Svg
                         style={{
-                            width: arrowStyle.size,
-                            height: arrowStyle.size,
+                            width: style.arrow.size,
+                            height: style.arrow.size,
                         }}
                     >
                         <Polygon
-                            points={getTriangleCoordStr(arrowStyle.size)}
-                            fill={arrowStyle.fill}
-                            stroke={arrowStyle.color}
-                            strokeWidth={arrowStyle.width}
+                            points={getTriangleCoordStr(style.arrow.size)}
+                            fill={style.arrow.fill}
+                            stroke={style.arrow.color}
+                            strokeWidth={style.arrow.width}
                         />
                     </Svg>
                 </CenteredView>
@@ -111,18 +107,18 @@ const Edge = ({
             {/* Bidirectional edge 2nd triangle */}
             {edge.directed === 2 && (
                 <CenteredView
-                    left={fpx + pVal * dx}
-                    top={fpy + pVal * dy}
+                    left={fpx + fromVal * dx}
+                    top={fpy + fromVal * dy}
                     angle={angle + 180}
                 >
                     <Svg
                         style={{
-                            width: arrowStyle.size,
-                            height: arrowStyle.size
+                            width: style.arrow.size,
+                            height: style.arrow.size
                         }}
                     >
                         <Polygon
-                            points={getTriangleCoordStr(arrowStyle.size)}
+                            points={getTriangleCoordStr(style.arrow.size)}
                             fill="white"
                             stroke="black"
                             strokeWidth="2"

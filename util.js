@@ -58,17 +58,21 @@ export const DEFAULT_STYLE = {
     }
 };
 
-export const inheritDefaultStyle = (inputStyle) => {
-    return {
-        vertices: { ...DEFAULT_STYLE.vertices, ...inputStyle?.vertices },
-        frame: { ...DEFAULT_STYLE.frame, ...inputStyle?.frame },
-        edges: {
-            line: { ...DEFAULT_STYLE.edges.line, ...inputStyle?.edges?.line },
-            arrow: { ...DEFAULT_STYLE.edges.arrow, ...inputStyle?.edges?.arrow },
-            label: { ...DEFAULT_STYLE.edges.label, ...inputStyle?.edges?.label }
-        }
-    };
-};
+export const inheritDefaultStyle = (inputStyles) => ({
+    frame: { ...DEFAULT_STYLE.frame, ...inputStyles?.frame },
+    
+    vertices: inputStyles?.vertices?.map(
+        s => ({ ...DEFAULT_STYLE.vertices, ...s })
+    ) || [ DEFAULT_STYLE.vertices ],
+
+    edges: inputStyles?.edges?.map(
+        s => ({
+            line: { ...DEFAULT_STYLE.edges.line, ...s?.line },
+            arrow: { ...DEFAULT_STYLE.edges.arrow, ...s?.arrow },
+            label: { ...DEFAULT_STYLE.edges.label, ...s?.label }
+        })
+    ) || [ DEFAULT_STYLE.edges ]
+});
 
 export const objArrCpy = (arr) => arr.map(o => ({ ...o }));
 

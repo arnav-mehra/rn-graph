@@ -12,9 +12,9 @@ import CenteredView from './CenteredView';
 
 const Vertex = ({
     vert,
+    style,
     zoom,
     pan,
-    style
 }) => {
     // make vertex draggable.
     const { selected, wrapperProps } = useDraggable(
@@ -43,10 +43,10 @@ const Vertex = ({
         >
             <View
                 style={{
-                    backgroundColor: style.vertices.color,
-                    borderRadius: style.vertices.radius,
-                    width: style.vertices.size,
-                    height: style.vertices.size,
+                    backgroundColor: style.color,
+                    borderRadius: style.radius,
+                    width: style.size,
+                    height: style.size,
                     
                     display: 'flex',
                     justifyContent: 'center',
@@ -55,8 +55,8 @@ const Vertex = ({
             >
                 <Text
                     style={{
-                        color: style.vertices.textColor,
-                        fontWeight: style.vertices.textWeight,
+                        color: style.textColor,
+                        fontWeight: style.textWeight,
                     }}
                 >
                     {vert.label}
