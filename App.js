@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { edges, vertices } from './util';
+import { edges, vertices } from './testData';
 
 import Graph from './components/Graph';
 

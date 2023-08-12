@@ -3,80 +3,79 @@ import { View } from 'react-native';
 
 import {
     FPS,
-    objArrCpy,
     inheritDefaultStyle,
-    pixelToCoord,
     initVertexLocations,
     initVertexEdgeMaps,
     initPanAndZoom,
     updateLocation,
+    inheritDefaultSettings,
 } from '../util';
 
 import Edge from './Edge';
 import Vertex from './Vertex';
-import useDraggable from './useDraggable';
-
+import useFrame from './useFrame';
 
 const Graph = ({
     vertices: inputVertices,
     edges: inputEdges,
-    styles: inputStyles
+    styles: inputStyles,
+    settings: inputSettings,
 }) => {
-    const [ styles, setStyles ] = useState(inheritDefaultStyle(inputStyles));
+    const { current: settings } = useRef(inheritDefaultSettings(inputSettings));
+    const { current: styles } = useRef(inheritDefaultStyle(inputStyles));
     const [ verts, setVerts ] = useState(inputVertices);
     const [ edges, setEdges ] = useState(inputEdges);
+
+    // maps for ez lookup
+    const { current: vertexMap } = useRef(new Map());
+    const { current: edgeMap } = useRef(new Map());
+
+    const frameIntervalRef = useRef();
+
+    const {
+        zoom, setZoom,
+        pan, setPan,
+        window, setWindow,
+        handleScroll,
+        panFrameProps
+    } = useFrame();
 
     // make reactive to input changes
     useEffect(() => {
         setVerts(inputVertices);
         setEdges(inputEdges);
-        setStyles(inheritDefaultStyle(inputStyles));
-    }, [ inputStyles, inputVertices, inputEdges ]);
-
-    // maps for fast lookup
-    const { current: vertexMap } = useRef(new Map());
-    const { current: edgeMap } = useRef(new Map());
-
-    // pan and zoom
-    const [ zoom, setZoom ] = useState(500);
-    const [ pan, setPan ] = useState([ 0, 0 ]);
-    const [ window, setWindow ] = useState();
+    }, [ inputVertices, inputEdges ]);
 
     // initialize maps & view.
     useEffect(() => {
         if (!window) return;
 
+        // init maps and vert locations
+
         initVertexEdgeMaps(verts, edges, vertexMap, edgeMap);
         initVertexLocations(verts, edgeMap, vertexMap);    
+
         const zoom = initPanAndZoom(verts, window);
         setZoom(zoom);
 
         setVerts([ ...verts ]);
 
-        setInterval(() => {
-            updateLocation(verts, edgeMap);
-            setVerts([ ...verts ]);
-        }, 1000 / FPS);
-    }, [ window ]);
+        // init vertex updates if non-static vs. static
 
-    // pan event handler
-    const { wrapperProps } = useDraggable((e) => {
-        pan[0] += e.movementX;
-        pan[1] += e.movementY;
-        setPan(pan);
-    });
-
-    // zoom event handler
-    const handleScroll = (e) => {
-        const newZoom = Math.max(zoom - e.deltaY / 5, 10);
-        
-        const [ x, y ] = pixelToCoord(e.clientX, e.clientY, zoom, pan);
-        pan[0] += x * (zoom - newZoom);
-        pan[1] += y * (zoom - newZoom);
-
-        setZoom(newZoom);
-        setPan(pan);
-    };
+        if (!settings.static && !frameIntervalRef.current) {
+            frameIntervalRef.current = setInterval(() => {
+                updateLocation(verts, edgeMap);
+                setVerts([ ...verts ]);
+            }, 1000 / FPS);
+        }
+        else if (settings.static) {
+            clearInterval(frameIntervalRef.current);
+            frameIntervalRef.current = undefined;
+        }
+        return () => {
+            clearInterval(frameIntervalRef.current);
+        }
+    }, [ window, settings.static ]);
 
     return (
         <View
@@ -89,9 +88,9 @@ const Graph = ({
             }}
             onWheel={handleScroll}
             onLayout={e => setWindow(e.nativeEvent.layout)}
-            {...wrapperProps}
+            {...panFrameProps}
         >
-            {verts.map((v) =>
+            {verts.map(v =>
                 <Vertex
                     key={v.id}
                     vert={v}

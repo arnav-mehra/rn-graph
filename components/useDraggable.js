@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 
-const useDraggable = (onMouseMove = () => {}, deps = []) => {
+const useDraggable = (
+    onMouseMove = () => {},
+    deps = []
+) => {
     const selected = useRef(false);
 
     const handleMouseMove = (e) => {
