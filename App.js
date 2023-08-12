@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { edges, vertices } from './testData';
+import { VertexComponent, edges, vertices } from './testData';
 
 import Graph from './components/Graph';
 
@@ -9,8 +9,10 @@ const App = () => {
       <Graph
         vertices={vertices}
         edges={edges}
-        width={'100%'}
-        height={'100%'}
+        settings={{
+          static: false
+        }}
+        VertexComponent={VertexComponent}
       />
     </View>
   );

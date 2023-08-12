@@ -1,3 +1,5 @@
+import { Text, View } from "react-native";
+
 export const vertices = [
     { id: 0, label: 'Node 0' },
     { id: 1, label: 'Node 1' },
@@ -17,3 +19,30 @@ export const edges = [
     { from: 2, to: 6, directed: true, label: 'Edge 5' },
     { from: 3, to: 6, directed: true, label: 'Edge 6' },
 ];
+
+export const VertexComponent = ({
+    vert,
+    style
+}) => (
+    <View
+        style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+
+            backgroundColor: style.color,
+            borderRadius: style.radius,
+            width: style.size,
+            height: style.size,
+        }}
+    >
+        <Text
+            style={{
+                color: style.textColor,
+                fontWeight: style.textWeight,
+            }}
+        >
+            {vert.label}
+        </Text>
+    </View>
+);

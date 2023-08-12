@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
 
 import {
     coordToPixel,
@@ -9,12 +8,11 @@ import {
 import useDraggable from './useDraggable';
 import CenteredView from './CenteredView';
 
-
-const Vertex = ({
+const VertexWrapper = ({
     vert,
-    style,
     zoom,
     pan,
+    children
 }) => {
     // make vertex draggable.
     const { selected, wrapperProps } = useDraggable(
@@ -41,29 +39,9 @@ const Vertex = ({
             top={py}
             {...wrapperProps}
         >
-            <View
-                style={{
-                    backgroundColor: style.color,
-                    borderRadius: style.radius,
-                    width: style.size,
-                    height: style.size,
-                    
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}
-            >
-                <Text
-                    style={{
-                        color: style.textColor,
-                        fontWeight: style.textWeight,
-                    }}
-                >
-                    {vert.label}
-                </Text>
-            </View>
+            {children}
         </CenteredView>
     )
 };
 
-export default Vertex;
+export default VertexWrapper;

@@ -2,7 +2,7 @@ export const FPS = 480;
 export const FPS_INV = 1 / FPS;
 
 export const DEFAULT_SETTINGS = {
-    static: false,
+    static: true,
 };
 
 export const DEFAULT_STYLE = {
@@ -39,13 +39,13 @@ export const DEFAULT_STYLE = {
 };
 
 export const inheritDefaultSettings = (inputSettings) => ({
-    ...inputSettings,
-    ...DEFAULT_SETTINGS
+    ...DEFAULT_SETTINGS,
+    ...inputSettings
 });
 
 export const inheritDefaultStyle = (inputStyles) => ({
     frame: { ...DEFAULT_STYLE.frame, ...inputStyles?.frame },
-    
+
     vertices: inputStyles?.vertices?.map(
         s => ({ ...DEFAULT_STYLE.vertices, ...s })
     ) || [ DEFAULT_STYLE.vertices ],

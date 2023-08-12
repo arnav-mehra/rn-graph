@@ -11,15 +11,16 @@ import {
     inheritDefaultSettings,
 } from '../util';
 
-import Edge from './Edge';
-import Vertex from './Vertex';
 import useFrame from './useFrame';
+import Edge from './Edge';
+import VertexWrapper from './VertexWrapper';
 
 const Graph = ({
     vertices: inputVertices,
     edges: inputEdges,
     styles: inputStyles,
     settings: inputSettings,
+    VertexComponent
 }) => {
     const { current: settings } = useRef(inheritDefaultSettings(inputSettings));
     const { current: styles } = useRef(inheritDefaultStyle(inputStyles));
@@ -80,9 +81,7 @@ const Graph = ({
     return (
         <View
             style={{
-                border: styles.frame.border,
-                width: styles.frame.width,
-                height: styles.frame.height,
+                ...styles.frame,
                 overflow: 'hidden',
                 position: 'relative'
             }}
@@ -91,13 +90,17 @@ const Graph = ({
             {...panFrameProps}
         >
             {verts.map(v =>
-                <Vertex
+                <VertexWrapper
                     key={v.id}
                     vert={v}
-                    style={styles.vertices[v.style || 0]}
                     zoom={zoom}
                     pan={pan}
-                />
+                >
+                    <VertexComponent
+                        vert={v}
+                        style={styles.vertices[v.style || 0]}
+                    />
+                </VertexWrapper>
             )}
             {edges.map(e => {
                 const from = vertexMap[e.from];
