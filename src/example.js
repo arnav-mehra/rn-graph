@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-export const vertices = [
+const exampleVertices = [
     { id: 0, label: 'Node 0' },
     { id: 1, label: 'Node 1' },
     { id: 2, label: 'Node 2' },
@@ -10,7 +10,7 @@ export const vertices = [
     { id: 6, label: 'Node 6' },
 ];
 
-export const edges = [
+const exampleEdges = [
     { from: 0, to: 1, directed: 2, label: 'Edge 0' },
     { from: 0, to: 2, directed: true, label: 'Edge 1' },
     { from: 0, to: 3, directed: true, label: 'Edge 2' },
@@ -20,7 +20,7 @@ export const edges = [
     { from: 3, to: 6, directed: true, label: 'Edge 6' },
 ];
 
-export const VertexComponent = ({
+const ExampleVertexComponent = ({
     vert,
     style
 }) => (
@@ -46,3 +46,16 @@ export const VertexComponent = ({
         </Text>
     </View>
 );
+
+const ExampleGraph = () => (
+    <Graph
+        vertices={exampleVertices}
+        edges={exampleEdges}
+        settings={{
+          static: false
+        }}
+        VertexComponent={ExampleVertexComponent}
+    />
+);
+
+export default ExampleGraph;

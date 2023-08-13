@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import useDraggable from './useDraggable';
-import { pixelToCoord } from '../util';
+import { pixelToCoord } from '../node-graph-viz/src/util';
 
 const useFrame = () => {
     const [ zoom, setZoom ] = useState(500);
@@ -25,25 +25,6 @@ const useFrame = () => {
         setZoom(newZoom);
         setPan(pan);
     };
-
-    // const CtxFrame = ({
-    //     style,
-    //     verts,
-    //     children,
-    //     zoomState,
-    //     panState,
-    //     windowState
-    // }) => (
-    //     <Frame
-    //         style={style}
-    //         verts={verts}
-    //         zoomState={zoomState}
-    //         panState={panState}
-    //         windowState={windowState}
-    //     >
-    //         {/* {children} */}
-    //     </Frame>
-    // );
 
     return {
         zoom, setZoom,

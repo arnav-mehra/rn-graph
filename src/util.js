@@ -1,8 +1,6 @@
-export const FPS = 480;
-export const FPS_INV = 1 / FPS;
-
 export const DEFAULT_SETTINGS = {
     static: true,
+    fps: 480
 };
 
 export const DEFAULT_STYLE = {
@@ -31,8 +29,8 @@ export const DEFAULT_STYLE = {
             fill: 'white'
         },
         label: {
+            fontSize: 12,
             color: 'black',
-            size: 12,
             weight: 'normal'
         }
     }
@@ -191,12 +189,12 @@ export const distanceToForce = (distSq, isEdge) => {
     return (4 * distSq); // attract
 };
 
-export const updateLocation = (verts, edgeMap) => {
+export const updateLocation = (verts, edgeMap, settings) => {
     for (let i = 0; i < verts.length; i++) {
         for (let j = i + 1; j < verts.length; j++) {
             const from = verts[i];
             const to = verts[j];
-    
+
             const dx = from.x - to.x;
             const dy = from.y - to.y;
             const dSq = dx * dx + dy * dy;
@@ -207,9 +205,9 @@ export const updateLocation = (verts, edgeMap) => {
             );
             if (f == 0) continue;
 
-            const xd = dx * f * FPS_INV;
-            const yd = dy * f * FPS_INV;
-            
+            const xd = dx * f / settings.fps;
+            const yd = dy * f / settings.fps;
+
             if (from.fixed) {
                 to.x += 2 * xd;
                 to.y += 2 * yd;

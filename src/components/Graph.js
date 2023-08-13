@@ -2,18 +2,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 import {
-    FPS,
     inheritDefaultStyle,
     initVertexLocations,
     initVertexEdgeMaps,
     initPanAndZoom,
     updateLocation,
     inheritDefaultSettings,
-} from '../util';
+} from '../node-graph-viz/src/util';
 
 import useFrame from './useFrame';
-import Edge from './Edge';
 import VertexWrapper from './VertexWrapper';
+import Edge from './Edge';
 
 const Graph = ({
     vertices: inputVertices,
@@ -64,10 +63,13 @@ const Graph = ({
         // init vertex updates if non-static vs. static
 
         if (!settings.static && !frameIntervalRef.current) {
-            frameIntervalRef.current = setInterval(() => {
-                updateLocation(verts, edgeMap);
-                setVerts([ ...verts ]);
-            }, 1000 / FPS);
+            frameIntervalRef.current = setInterval(
+                () => {
+                    updateLocation(verts, edgeMap);
+                    setVerts([ ...verts ]);
+                },
+                1000 / settings.fps
+            );
         }
         else if (settings.static) {
             clearInterval(frameIntervalRef.current);
@@ -98,7 +100,7 @@ const Graph = ({
                 >
                     <VertexComponent
                         vert={v}
-                        style={styles.vertices[v.style || 0]}
+                        style={styles.vertexStylePresets[v.style || 0]}
                     />
                 </VertexWrapper>
             )}
@@ -110,11 +112,11 @@ const Graph = ({
                     <Edge
                         key={`${e.from}-${e.to}`}
                         edge={e}
-                        style={styles.edges[e.style || 0]}
                         from={from}
-                        fromStyle={styles.vertices[from.style || 0]}
                         to={to}
-                        toStyle={styles.vertices[to.style || 0]}
+                        style={styles.edgeStylePresets[e.style || 0]}
+                        fromStyle={styles.vertexStylePresets[from.style || 0]}
+                        toStyle={styles.vertexStylePresets[to.style || 0]}
                         zoom={zoom}
                         pan={pan}
                     />

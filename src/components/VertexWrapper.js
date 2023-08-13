@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import {
     coordToPixel,
     pixelToCoordDelta
-} from '../util';
+} from '../node-graph-viz/src/util';
 
 import useDraggable from './useDraggable';
 import CenteredView from './CenteredView';

@@ -1,20 +1,20 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Text } from 'react-native';
 import { Svg, Line, Polygon } from 'react-native-svg';
 
 import {
     coordToPixel,
     getTriangleCoordStr
-} from '../util';
-import CenteredView from './CenteredView';
+} from '../node-graph-viz/src/util';
 
+import CenteredView from './CenteredView';
 
 const Edge = ({
     edge,
-    style,
     from,
-    fromStyle,
     to,
+    style,
+    fromStyle,
     toStyle,
     zoom,
     pan,
@@ -23,7 +23,7 @@ const Edge = ({
     const dx = from.x - to.x;
     const dy = from.y - to.y;
     const d = Math.sqrt(dx * dx + dy * dy);
-    
+
     // calculate initial & final pixel coords.
     const [ ipx, ipy ] = coordToPixel(
         from.x, from.y, zoom, pan
@@ -51,10 +51,8 @@ const Edge = ({
                 >
                     <Text
                         style={{
-                            color: style.label.color,
-                            fontSize: style.label.size,
-                            fontWeight: style.label.weight,
-                            paddingBottom: '50%'
+                            paddingBottom: '50%',
+                            ...style.label
                         }}
                     >
                         {edge.label}
@@ -127,7 +125,7 @@ const Edge = ({
                 </CenteredView>
             )}
         </>
-    )
-}
+    );
+};
 
-export default Edge
+export default Edge;

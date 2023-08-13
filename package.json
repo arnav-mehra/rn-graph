@@ -21,5 +21,16 @@
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": false,
+  "description": "A node graph visualizer for react native.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arnav-mehra/RN-Graph.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arnav-mehra/RN-Graph/issues"
+  },
+  "homepage": "https://github.com/arnav-mehra/RN-Graph#readme"
 }
