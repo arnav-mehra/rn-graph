@@ -8,7 +8,7 @@
 
 ## Example
 
-    ![failed to load](https://github.com/arnav-mehra/RN-Graph/edit/master/assets/example.png)
+![failed to load](https://github.com/arnav-mehra/RN-Graph/edit/master/assets/example.png)
 
 ## Available Components
 
