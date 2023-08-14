@@ -1,8 +1,23 @@
-Available Components:
+## Description
 
-1. Graph
+	A cross-compatible react native library for node graph visualizations.
 
-    Props:
+## Installation
+
+	npm i rn-graph
+
+## Example
+
+    ![failed to load](https://github.com/arnav-mehra/RN-Graph/edit/master/assets/example.png)
+
+## Available Components
+
+### Graph
+
+	Description:
+	    The core component of this library.
+
+	Props:
         vertices! = {
             id!:        string | number     [unique identifier],
             style:      number              [idx of style preset. (default = 0)],
@@ -44,7 +59,10 @@ Available Components:
         VertexComponent! = (vert, preset_style_object) => React.JSX.element
                                             [define vertex rendering component.]
 
-2. ExampleGraph
+### ExampleGraph
 
-    Props:
-        None
+	Description:
+        An example of <Graph/> with predefined props.
+   
+	Props:
+        None.
