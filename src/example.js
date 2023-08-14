@@ -61,4 +61,4 @@ const ExampleGraph = () => (
     />
 );
 
-export default registerRootComponent(ExampleGraph);
+export default ExampleGraph;

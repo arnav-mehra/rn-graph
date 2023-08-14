@@ -54,3 +54,5 @@ yarn-error.log
 web-build/
 dist/
 package-lock.json
+
+assets/

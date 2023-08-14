@@ -1,7 +1,7 @@
 {
   "name": "rn-graph",
   "version": "1.0.0",
-  "main": "src/example.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
