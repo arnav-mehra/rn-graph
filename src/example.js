@@ -1,4 +1,6 @@
 import { Text, View } from "react-native";
+import Graph from "./components/Graph";
+import { registerRootComponent } from "expo";
 
 const exampleVertices = [
     { id: 0, label: 'Node 0' },
@@ -29,17 +31,18 @@ const ExampleVertexComponent = ({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-
-            backgroundColor: style.color,
-            borderRadius: style.radius,
+            
             width: style.size,
             height: style.size,
+
+            border: `2px solid ${style.color}`,
+            backgroundColor: 'white',
+            borderRadius: style.radius,
         }}
     >
         <Text
             style={{
-                color: style.textColor,
-                fontWeight: style.textWeight,
+                color: 'black'
             }}
         >
             {vert.label}
@@ -58,4 +61,4 @@ const ExampleGraph = () => (
     />
 );
 
-export default ExampleGraph;
+export default registerRootComponent(ExampleGraph);

@@ -8,7 +8,7 @@ import {
     initPanAndZoom,
     updateLocation,
     inheritDefaultSettings,
-} from '../node-graph-viz/src/util';
+} from '../util';
 
 import useFrame from './useFrame';
 import VertexWrapper from './VertexWrapper';
@@ -65,7 +65,7 @@ const Graph = ({
         if (!settings.static && !frameIntervalRef.current) {
             frameIntervalRef.current = setInterval(
                 () => {
-                    updateLocation(verts, edgeMap);
+                    updateLocation(verts, edgeMap, settings);
                     setVerts([ ...verts ]);
                 },
                 1000 / settings.fps

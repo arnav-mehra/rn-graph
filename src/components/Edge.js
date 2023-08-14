@@ -5,7 +5,7 @@ import { Svg, Line, Polygon } from 'react-native-svg';
 import {
     coordToPixel,
     getTriangleCoordStr
-} from '../node-graph-viz/src/util';
+} from '../util';
 
 import CenteredView from './CenteredView';
 
@@ -117,9 +117,9 @@ const Edge = ({
                     >
                         <Polygon
                             points={getTriangleCoordStr(style.arrow.size)}
-                            fill="white"
-                            stroke="black"
-                            strokeWidth="2"
+                            fill={style.arrow.fill}
+                            stroke={style.arrow.color}
+                            strokeWidth={style.arrow.width}
                         />
                     </Svg>
                 </CenteredView>

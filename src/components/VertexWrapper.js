@@ -3,10 +3,11 @@ import React, { useEffect } from 'react';
 import {
     coordToPixel,
     pixelToCoordDelta
-} from '../node-graph-viz/src/util';
+} from '../util';
 
 import useDraggable from './useDraggable';
 import CenteredView from './CenteredView';
+import { View } from 'react-native';
 
 const VertexWrapper = ({
     vert,

@@ -20,12 +20,12 @@ export const DEFAULT_STYLE = {
     edges: {
         line: {
             color: 'black',
-            width: 2
+            width: 1
         },
         arrow: {
             size: 12,
             color: 'black',
-            width: 2,
+            width: 1,
             fill: 'white'
         },
         label: {
@@ -44,11 +44,11 @@ export const inheritDefaultSettings = (inputSettings) => ({
 export const inheritDefaultStyle = (inputStyles) => ({
     frame: { ...DEFAULT_STYLE.frame, ...inputStyles?.frame },
 
-    vertices: inputStyles?.vertices?.map(
+    vertexStylePresets: inputStyles?.vertexStylePresets?.map(
         s => ({ ...DEFAULT_STYLE.vertices, ...s })
     ) || [ DEFAULT_STYLE.vertices ],
 
-    edges: inputStyles?.edges?.map(
+    edgeStylePresets: inputStyles?.edgeStylePresets?.map(
         s => ({
             line: { ...DEFAULT_STYLE.edges.line, ...s?.line },
             arrow: { ...DEFAULT_STYLE.edges.arrow, ...s?.arrow },

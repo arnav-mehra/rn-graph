@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import useDraggable from './useDraggable';
-import { pixelToCoord } from '../node-graph-viz/src/util';
+import { pixelToCoord } from '../util';
 
 const useFrame = () => {
     const [ zoom, setZoom ] = useState(500);
