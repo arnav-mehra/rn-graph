@@ -8,7 +8,14 @@
 
 ## Example
 
-![failed to load](https://github.com/arnav-mehra/RN-Graph/blob/master/assets/example.png?raw=true)
+<p align="center">
+	<img
+		src="https://github.com/arnav-mehra/RN-Graph/blob/master/assets/example.png?raw=true"
+		width="400"
+		alt="example-img"
+	>
+</p>
+	
 
 ## Available Components
 
